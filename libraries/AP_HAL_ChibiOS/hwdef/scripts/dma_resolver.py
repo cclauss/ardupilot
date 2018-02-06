@@ -26,9 +26,9 @@ def check_possibility(periph, dma_stream, curr_dict, dma_map, check_list):
 				#check if we did this before
 				if check_str in check_list:
 					return False
-				check_list.append(check_str)
-                                if debug:
-                                        print("Trying to Resolve Conflict: ", check_str)
+                check_list.append(check_str)
+                    if debug:
+                        print("Trying to Resolve Conflict: ", check_str)
 				#check if we can resolve by swapping with other periphs
 				for stream in dma_map[other_periph]:
 					if stream != curr_dict[other_periph] and \
