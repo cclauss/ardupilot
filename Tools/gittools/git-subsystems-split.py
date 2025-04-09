@@ -23,6 +23,7 @@ Options:
 
 import argparse
 import logging
+import os
 import subprocess
 from collections.abc import Iterator
 from pathlib import Path
@@ -56,8 +57,6 @@ def parse_args() -> argparse.Namespace:
 
         If --edit is not passed, then assume that --copy is passed.
     """
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="Split HEAD commit into multiple commits separated by subsystem"
     )
@@ -130,6 +129,20 @@ def get_git_commit_message() -> str:
     commit_message = run_command(["git", "log", "-n", "1", "--format=%B"])
     logger.debug(f"Commit message: {commit_message}")
     return commit_message
+
+
+def edit_subsystems_split_message() -> None:
+    """Edit the commit message file.
+
+    Translate this bash code to Python:
+    ${EDITOR:-vi} ${MSG_FILE:-.git/SUBSYSTEMS_SPLIT_MSG}
+    """
+    git_dir = Path(run_command(["git", "rev-parse", "--git-dir"]))
+    msg_file = git_dir / "SUBSYSTEMS_SPLIT_MSG"
+    logger.debug(f"Editing commit message file: {msg_file}")
+    editor = run_command(["git", "var", "GIT_EDITOR"]) or os.getenv("EDITOR", "vi")
+    subprocess.run([editor, str(msg_file)], check=True)
+    logger.debug(f"Edited commit message file: {msg_file}")
 
 
 def get_git_head() -> str:
