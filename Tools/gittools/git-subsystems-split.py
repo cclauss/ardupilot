@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-"""
-Rewrite Tools/gittools/git-subsystems-split in Python.
+"""Rewrite Tools/gittools/git-subsystems-split in Python.
 
 git-subsystems-split.py [OPTIONS]
 
@@ -27,6 +26,49 @@ import os
 import subprocess
 from collections.abc import Iterator
 from pathlib import Path
+
+COMMIT_PREFIXES = {
+    s.lower(): s  # The dict key will be a lowercase version of the dict value.
+    for s in {
+        "AC_Fence",
+        "AP_Arming",
+        "AP_BattMonitor",
+        "AP_BoardConfig",
+        "AP_Compass",
+        "AP_EFI",
+        "AP_ExternalAHRS",
+        "AP_GPS",
+        "AP_HAL_ChibiOS",
+        "AP_HAL",
+        "AP_InertialSensor",
+        "AP_Logger",
+        "AP_Mission",
+        "AP_NavEKF3",
+        "AP_RangeFinder",
+        "AP_Scripting",
+        "AP_TECS",
+        "AP_VisualOdom",
+        "ArduCopter",
+        "ArduPlane",
+        "ArduRover",
+        "ArduSub",
+        "autotest",
+        "DroneCAN",
+        "EKF",
+        "GPS",
+        "ground_control",
+        "HAL_ChibiOS",
+        "hwdef",
+        "IMU",
+        "libraries",
+        "MAVLink",
+        "Plane",
+        "RC",
+        "Scripting",
+        "SITL",
+        "Tools",
+    }
+}
 
 """
 SCRIPT_DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
@@ -162,3 +204,22 @@ def get_git_subsystems_split_message() -> str:
     msg_file = git_dir / "SUBSYSTEMS_SPLIT_MSG"
     logger.debug(f"Getting commit message from {msg_file}")
     return msg_file.read_text()
+
+
+def get_commit_prefix_from_filepath(filepath: Path) -> str:
+    """Drop the filename from the filepath and then read the filepath from right to
+    left and return the rightmost commit_prefix.  Regardless of the case in the
+    filepath, always return the commit_prefix in the case in COMMIT_PREFIXES.
+
+    >>> get_commit_prefix_from_filepath(Path("lib/aP_hAl_ChIbIoS/tOOl/README.md"))
+    'AP_HAL_ChibiOS'
+    >>> get_commit_prefix_from_filepath(Path("lib/aP_hAl_ChIbIoS/tOOls/README.md"))
+    'Tools'
+    """
+    # Drop the filename from the filepath
+    filepath = filepath.parent
+    # Read the filepath from right to left and return the rightmost commit_prefix.
+    for part in reversed(filepath.parts):
+        if commit_prefix := COMMIT_PREFIXES.get(part.lower()):
+            return commit_prefix
+    return "root"  # Default to "root" if no commit_prefix is found.
