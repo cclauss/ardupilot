@@ -49,6 +49,7 @@ COMMIT_PREFIXES = {
         "AP_Scripting",
         "AP_TECS",
         "AP_VisualOdom",
+        "ardupilotwaf",
         "ArduCopter",
         "ArduPlane",
         "ArduRover",
@@ -76,6 +77,8 @@ COMMIT_PREFIXES = {
         "Tools",
     }
 }
+# Files in the root directory and also in "Tools/ardupilotwaf" should use prefix "waf".
+COMMIT_PREFIXES["ardupilotwaf"] = "waf"  # Add a special case for Tools/ardupilotwaf.
 
 """
 SCRIPT_DIR=$(dirname $(realpath ${BASH_SOURCE[0]}))
