@@ -31,6 +31,7 @@ COMMIT_PREFIXES = {
     s.lower(): s  # The dict key will be a lowercase version of the dict value.
     for s in {
         "AC_Fence",
+        "AntennaTracker",
         "AP_Arming",
         "AP_BattMonitor",
         "AP_BoardConfig",
@@ -53,6 +54,9 @@ COMMIT_PREFIXES = {
         "ArduRover",
         "ArduSub",
         "autotest",
+        "benchmarks",
+        "Blimp",
+        "docs",
         "DroneCAN",
         "EKF",
         "GPS",
@@ -62,10 +66,13 @@ COMMIT_PREFIXES = {
         "IMU",
         "libraries",
         "MAVLink",
+        "modules",
         "Plane",
         "RC",
+        "Rover",
         "Scripting",
         "SITL",
+        "tests",
         "Tools",
     }
 }
@@ -222,4 +229,21 @@ def get_commit_prefix_from_filepath(filepath: Path) -> str:
     for part in reversed(filepath.parts):
         if commit_prefix := COMMIT_PREFIXES.get(part.lower()):
             return commit_prefix
-    return "root"  # Default to "root" if no commit_prefix is found.
+    return "waf"  # Default to "waf" if no commit_prefix is found.
+
+def find_missing_prefixes() -> Iterator[Path]:
+    """Find all files in the git repository that do not have a commit prefix.
+
+    This should only yield `PosixPath('.')`. 
+    """
+    git_root = Path(run_command(["git", "rev-parse", "--show-toplevel"])).resolve()
+    for file in git_root.rglob("*"):
+        if file.is_file() and not file.name.startswith("."):
+            file = file.relative_to(git_root)
+            # Only files in the root directory should have a commit prefix of "waf".
+            if not str(file).startswith(".") and get_commit_prefix_from_filepath(file) == "waf":
+                yield file.parent
+
+if __name__ == "__main__":
+    print(sorted(set(find_missing_prefixes())))
+    
