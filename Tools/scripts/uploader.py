@@ -785,7 +785,7 @@ class uploader(object):
                     x = self.__getSN(byte)
                     x = x[::-1]  # reverse the bytes
                     print(binascii.hexlify(x).decode('Latin-1'), end='')  # show user
-                print('')
+                print()
             except Exception:  # noqa: BLE001
                 # ignore bad character encodings
                 pass

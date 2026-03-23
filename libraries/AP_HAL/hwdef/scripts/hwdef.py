@@ -205,7 +205,7 @@ class HWDef:
             if False:
                 raise e
             self.error("Unable to open file %s" % filename)
-        for line in f.readlines():
+        for line in f:
             line = line.split('#')[0] # ensure we discard the comments
             line = line.strip()
             if len(line) == 0 or line[0] == '#':

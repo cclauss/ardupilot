@@ -125,7 +125,7 @@ class DecodeWatchDog(object):
             super(DecodeWatchDog.ComponentFICSR, self).print_decoded()
             decoder = decode_ICSR.DecodeICSR()
             text = decoder.string(int(self.value))
-            sys.stdout.write(re.sub("^", "        ", text, flags=re.M))
+            sys.stdout.write(re.sub("^", "        ", text, flags=re.MULTILINE))
 
     class ComponentMM(Component):
 

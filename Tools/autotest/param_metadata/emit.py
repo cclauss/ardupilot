@@ -27,4 +27,4 @@ class Emit:
         return True
 
     def should_emit_field(self, param, field):
-        return field not in ['Legacy']
+        return field != 'Legacy'

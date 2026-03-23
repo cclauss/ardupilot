@@ -31,7 +31,7 @@ This is a list of log messages which may be present in logs produced and stored 
         self.start()
         for docco in doccos:
             print('.. _%s:' % docco.name, file=self.fh)
-            print("", file=self.fh)
+            print(file=self.fh)
             desc = docco.description
             print(docco.name, file=self.fh)
             print("~" * len(docco.name), file=self.fh)
@@ -82,7 +82,7 @@ This is a list of log messages which may be present in logs produced and stored 
             if rows:
                 print(self.tablify(rows), file=self.fh)
 
-            print("", file=self.fh)
+            print(file=self.fh)
         self.stop()
 
     def stop(self):

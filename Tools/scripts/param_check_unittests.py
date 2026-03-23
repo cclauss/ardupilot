@@ -298,7 +298,7 @@ class TestParamCheck(unittest.TestCase):
         mock_file_content = "PARAM1, 50.0 # DISABLE_CHECKS: reason\nPARAM2, 0\n"
         # Mock check_param so PARAM1 is valid, but not PARAM2
         mock_check_param.side_effect = lambda name, value, metadata, skip: (
-            None if name in ['PARAM1'] else f'{name}: Error'
+            None if name == 'PARAM1' else f'{name}: Error'
         )
         with patch('builtins.open', mock_open(read_data=mock_file_content)):
             msgs = check_file('fake_file.parm', mock_metadata, mock_skip)

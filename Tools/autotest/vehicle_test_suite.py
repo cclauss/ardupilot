@@ -2710,7 +2710,7 @@ class TestSuite(abc.ABC):
             debug = False
             if f == "/home/pbarker/rc/ardupilot/libraries/AP_HAL_ChibiOS/LogStructure.h":
                 debug = True
-            for line in open(f).readlines():
+            for line in open(f):
                 if debug:
                     print("line: %s" % line)
                 if isinstance(line, bytes):
@@ -2795,7 +2795,7 @@ class TestSuite(abc.ABC):
         linestate_none = 89
         linestate_within = 90
         linestate = linestate_none
-        for line in open(filepath, 'rb').readlines():
+        for line in open(filepath, 'rb'):
             if isinstance(line, bytes):
                 line = line.decode("utf-8")
             line = re.sub("//.*", "", line) # trim comments
@@ -2895,7 +2895,7 @@ class TestSuite(abc.ABC):
                         # this is the sample file which contains examples...
                         continue
                     count = 0
-                    for line in open(filepath, 'rb').readlines():
+                    for line in open(filepath, 'rb'):
                         if isinstance(line, bytes):
                             line = line.decode("utf-8")
                         if state == state_outside:
@@ -5061,7 +5061,7 @@ class TestSuite(abc.ABC):
                         if int(i2) in [3, 10]:
                             i2 = 0
                 if count == 6: # param 3
-                    if t in [mavutil.mavlink.MAV_CMD_NAV_LOITER_TIME]:
+                    if t == mavutil.mavlink.MAV_CMD_NAV_LOITER_TIME:
                         # ardupilot canonicalises this to -1 for ccw or 1 for cw.
                         if float(i1) == 0:
                             i1 = 1.0

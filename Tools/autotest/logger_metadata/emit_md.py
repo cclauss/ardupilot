@@ -91,7 +91,7 @@ DO NOT EDIT
                 else:
                     ftypeunits = ""
                 print(f'|{f}|{ftypeunits}|{fdesc}|', file=self.fh)
-            print("", file=self.fh)
+            print(file=self.fh)
         self.stop()
 
     def stop(self):

@@ -96,7 +96,7 @@ class CopterTakeoff(Node):
 
     def switch_mode(self, mode):
         req = ModeSwitch.Request()
-        assert mode in [COPTER_MODE_GUIDED]
+        assert mode == COPTER_MODE_GUIDED
         req.mode = mode
         future = self._client_mode_switch.call_async(req)
         rclpy.spin_until_future_complete(self, future)

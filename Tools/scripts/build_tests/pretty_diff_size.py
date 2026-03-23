@@ -56,7 +56,7 @@ def sizes_for_file(filepath):
 def print_table(summary_data_list_second, summary_data_list_master):
     """Print the binaries size diff on a table."""
     print_data = []
-    print("")
+    print()
     # print(summary_data_list_second)
     # print(summary_data_list_master)
     for name in summary_data_list_second[0]:

@@ -413,7 +413,7 @@ class TestBuildOptions(object):
             # these don't instantiate terrain
             feature_define_whitelist.add('EK3_FEATURE_OPTFLOW_SRTM')
 
-        if target.lower() not in ["AP_Periph"]:
+        if target.lower() != "AP_Periph":
             feature_define_whitelist.add(r'AP_PERIPH_.*')
 
         for some_re in feature_define_whitelist:

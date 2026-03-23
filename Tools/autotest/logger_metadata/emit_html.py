@@ -61,7 +61,7 @@ DO NOT EDIT
                       file=self.fh)
             print('        </table>', file=self.fh)
 
-            print("", file=self.fh)
+            print(file=self.fh)
         self.stop()
 
     def stop(self):

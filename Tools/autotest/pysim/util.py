@@ -479,7 +479,7 @@ def start_SITL(binary,
             # attach gdb to the gdbserver:
             f = open("/tmp/x.gdb", "w")
             f.write("target extended-remote localhost:3333\nc\n")
-            for breakingpoint in breakpoints:
+            for breakingpoint in breakpoints:  # noqa: FURB122
                 f.write("b %s\n" % (breakingpoint,))
             if disable_breakpoints:
                 f.write("disable\n")

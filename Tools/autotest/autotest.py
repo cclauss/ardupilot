@@ -806,7 +806,7 @@ def list_subtests():
         print("%s:" % vehicle)
         for subtest in sorted_list:
             print("    %s: %s" % (subtest[0], subtest[1]))
-        print("")
+        print()
 
 
 def list_subtests_for_vehicle(vehicle_type):
@@ -826,7 +826,7 @@ def list_subtests_for_vehicle(vehicle_type):
         sorted_list.sort()
         for subtest in sorted_list:
             print("%s " % subtest[0], end='')
-        print("")  # needed to clear the trailing %
+        print()  # needed to clear the trailing %
 
 
 if __name__ == "__main__":

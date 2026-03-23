@@ -114,7 +114,7 @@ class SizeHistory(BuildScriptBase):
     def print_size_table(self, results):
         '''print the size table to stdout'''
         # header
-        print("")
+        print()
         print("%-12s %-50s %12s %12s %12s" % (
             "Commit", "Subject", "Flash Used", "Flash Free", "Delta Used"))
         print("-" * 100)
@@ -148,7 +148,7 @@ class SizeHistory(BuildScriptBase):
 
     def print_feature_report(self, results):
         '''print feature change report to stdout'''
-        print("")
+        print()
         print("Feature Changes:")
         print("-" * 80)
 

@@ -291,7 +291,7 @@ class BuildScriptBase:
                 size_bss=size_bss,
                 size_total=int(row[0]) + int(row[1]) - ext_flash_used,
                 size_free_flash=size_free_flash,
-                ext_flash_used=ext_flash_used if ext_flash_used else None,
+                ext_flash_used=ext_flash_used or None,
             )
 
         raise ValueError(f"Could not parse size output for {elf_path}")
