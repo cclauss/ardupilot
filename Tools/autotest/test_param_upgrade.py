@@ -305,15 +305,11 @@ class TestParamUpgrade():
                  run_eedump_after=False,
                  master_branch="master",
                  ):
-        self.vehicles = vehicles
         self.param_changes = param_changes
-        self.vehicles = vehicles
+        self.vehicles = vehicles or self.all_vehicles()
         self.run_eedump_before = run_eedump_before
         self.run_eedump_after = run_eedump_after
         self.master_branch = master_branch
-
-        if self.vehicles is None:
-            self.vehicles = self.all_vehicles()
 
     def all_vehicles(self):
         return [

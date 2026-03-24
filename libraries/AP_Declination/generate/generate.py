@@ -59,7 +59,7 @@ inclination_table = np.empty((NUM_LAT, NUM_LON))
 declination_table = np.empty((NUM_LAT, NUM_LON))
 
 max_error = 0
-max_error_pos = None
+max_error_pos = (0, 0)
 max_error_field = None
 
 def get_igrf(lat, lon):

@@ -121,7 +121,7 @@ class LoggerDocco(object):
                 self.description = [self.description]
             # Replace any existing empty descriptions with empty strings
             for i in range(0, len(self.description)):
-                if self.description[i] is None:
+                if self.description[i] is None:  # type: ignore[not-subscriptable]
                     self.description[i] = ""
             # Extend the name and description lists
             if isinstance(name, list):

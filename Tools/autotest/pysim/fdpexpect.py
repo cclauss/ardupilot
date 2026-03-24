@@ -56,7 +56,7 @@ class fdspawn(spawn):
         if self.child_fd == -1:
             return
         if self.own_fd:
-            self.close(self)
+            self.close(self)  # type: ignore[too-many-positional-arguments]
         else:
             self.flush()
             os.close(self.child_fd)

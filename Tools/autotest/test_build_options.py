@@ -62,9 +62,7 @@ class TestBuildOptions(object):
         self.do_step_run_with_defaults = do_step_disable_defaults
         self.do_step_disable_in_turn = do_step_disable_in_turn
         self.do_step_enable_in_turn = do_step_enable_in_turn
-        self.build_targets = build_targets
-        if self.build_targets is None:
-            self.build_targets = self.all_targets()
+        self.build_targets = build_targets or self.all_targets()
         self._board = board
         self.emit_disable_all_defines = emit_disable_all_defines
         self.resume = resume

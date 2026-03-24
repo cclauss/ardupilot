@@ -193,7 +193,7 @@ if __name__ == '__main__':
 
     # Secondary iterator, tail type for single heli and dual mode for dual heli
     secondary_iter = [None]
-    secondary_lookup = None
+    secondary_lookup = []
     secondary_name = None
     if args.dual_mode != [None]:
         secondary_iter = args.dual_mode

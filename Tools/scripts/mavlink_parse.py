@@ -346,7 +346,7 @@ class MAVLinkDetector:
 
         if self._unsupported[type]:
             yield f'missing_{type}'
-            yield from self._unsupported[type]
+            yield from self._unsupported[type]  # type: ignore[not-iterable]
 
     def get_iterable(self, include_commands=False, include_stream_groups=False,
                      include_unsupported=False):

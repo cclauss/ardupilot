@@ -187,6 +187,8 @@ class firmware(object):
         return default
 
     def extf_crc(self, size):
+        if self.extf_image is None:
+            raise AssertionError("firmware does not contain an external flash image")
         state = crc32(self.extf_image[:size], int(0))
         return state
 
