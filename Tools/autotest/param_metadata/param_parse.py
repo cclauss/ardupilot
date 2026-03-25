@@ -724,7 +724,7 @@ except ImportError:
 # filter to just the ones we want to emit:
 emitters_to_use = []
 for emitter_name in all_emitters.keys():
-    if args.output_format == 'all' or args.output_format == emitter_name:
+    if args.output_format in ('all', emitter_name):
         emitters_to_use.append(emitter_name)
 
 # actually invoke each emitter:

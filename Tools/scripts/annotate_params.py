@@ -26,6 +26,7 @@ import glob
 import logging
 import os
 import re
+import sys
 import xml.etree.ElementTree as ET
 
 from typing import Any
@@ -407,7 +408,7 @@ def main():
             print_read_only_params(doc_dict)
     except Exception as exp:  # pylint: disable=W0718  # noqa: BLE001
         logging.fatal(exp)
-        exit(1)  # pylint: disable=R1722
+        sys.exit(1)  # pylint: disable=R1722
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ AP_FLAKE8_CLEAN
 
 import json
 import os
+import sys
 
 from argparse import ArgumentParser
 from enum import Enum
@@ -69,16 +70,16 @@ def download_files(ip_address, dest_dir):
 
             # check that the request succeeded
             if (not dir_dict['success']):
-                exit(prefix_str + "failed to get list of directories")
+                sys.exit(prefix_str + "failed to get list of directories")
 
             # check response includes 'data'
             if ('data' not in dir_dict.keys()):
-                exit(prefix_str + "could not get list of directories, no 'data' in response")
+                sys.exit(prefix_str + "could not get list of directories, no 'data' in response")
             dir_dict_data = dir_dict['data']
 
             # check response includes 'directories'
             if ('directories' not in dir_dict_data.keys()):
-                exit(prefix_str + "could not get list of directories, no 'directories' in response")
+                sys.exit(prefix_str + "could not get list of directories, no 'directories' in response")
             dir_dict_data_directories = dir_dict_data['directories']
 
             # create list of directories from 'path' values
@@ -96,23 +97,23 @@ def download_files(ip_address, dest_dir):
 
                     # check that the request succeeded
                     if (not filename_dict['success']):
-                        exit(prefix_str + "failed to get list of files")
+                        sys.exit(prefix_str + "failed to get list of files")
 
                     # check response includes 'data'
                     if ('data' not in filename_dict.keys()):
-                        exit(prefix_str + "could not get list of files, no 'data' in response")
+                        sys.exit(prefix_str + "could not get list of files, no 'data' in response")
                     filename_dict_data = filename_dict['data']
 
                     # check response includes 'list'
                     if ('list' not in filename_dict_data.keys()):
-                        exit(prefix_str + "could not get list of files, no 'list' in response")
+                        sys.exit(prefix_str + "could not get list of files, no 'list' in response")
                     filename_dict_data_list = filename_dict_data['list']
                     print(prefix_str + f"{len(filename_dict_data_list)} files")
 
                     # download each image
                     for fileinfo in filename_dict_data_list:
                         if ('name' not in fileinfo.keys() or 'url' not in fileinfo.keys()):
-                            exit(prefix_str + "could not get list of files, no 'name' or 'url' in response")
+                            sys.exit(prefix_str + "could not get list of files, no 'name' or 'url' in response")
                         filename = fileinfo['name']
                         file_url = fileinfo['url']
 
@@ -137,7 +138,7 @@ def main():
 
     # check destination directory exists
     if not os.path.exists(args.dest):
-        exit(prefix_str + "invalid destination directory")
+        sys.exit(prefix_str + "invalid destination directory")
 
     # download files
     download_files(args.ipaddr, args.dest)

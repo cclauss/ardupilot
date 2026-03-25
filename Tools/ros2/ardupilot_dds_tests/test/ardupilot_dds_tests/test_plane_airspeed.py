@@ -60,7 +60,7 @@ class AirspeedTester(rclpy.node.Node):
         self.subscription = self.create_subscription(Airspeed, TOPIC, self.airspeed_data_callback, qos_profile)
 
         # Add a spin thread.
-        self.ros_spin_thread = threading.Thread(target=lambda node: rclpy.spin(node), args=(self,))
+        self.ros_spin_thread = threading.Thread(target=rclpy.spin, args=(self,))
         self.ros_spin_thread.start()
 
     def airspeed_data_callback(self, msg):

@@ -186,7 +186,7 @@ class TestLoweheiser(object):
         line = sys.stdin.readline()
         line = line.rstrip()
 
-        if line == "off" or line == "run":
+        if line in {"off", "run"}:
             self.desired_state = line
             return
 

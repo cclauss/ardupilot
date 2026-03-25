@@ -1082,7 +1082,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             if m.get_type() != "SERVO_OUTPUT_RAW":
                 return
             value = getattr(m, "servo%u_raw" % channel)
-            if value != expected_servo_output_value and value != trim_value:
+            if value not in (expected_servo_output_value, trim_value):
                 raise NotAchievedException("Bad servo value %u received" % value)
 
         self.install_message_hook_context(ensure_SERVO_values_never_input)

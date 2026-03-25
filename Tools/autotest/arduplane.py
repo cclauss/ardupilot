@@ -3114,7 +3114,7 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
             maximum=(want_speed+speed_tolerance, want_dir+dir_tolerance),
             current_value_getter=value_getter,
             value_averager=ValueAverager(),
-            validator=lambda last, _min, _max: validator(last, _min, _max),
+            validator=validator,
             timeout=timeout,
             **kwargs
         )

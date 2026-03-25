@@ -75,7 +75,7 @@ class CoverageRunner(object):
         retcode = subprocess.call(["lcov", "--zerocounters", "--directory", root_dir])
         if retcode != 0:
             self.progress("Failed with retcode (%s)" % retcode)
-            exit(1)
+            sys.exit(1)
 
         self.progress("Initializing Coverage with current build")
         try:
@@ -96,7 +96,7 @@ class CoverageRunner(object):
             print("ERROR :")
             print(err.cmd)
             print(err.output)
-            exit(1)
+            sys.exit(1)
         self.progress("Initialization done")
 
     def check_build(self, name, path) -> bool:
@@ -143,7 +143,7 @@ class CoverageRunner(object):
             print("ERROR :")
             print(err.cmd)
             print(err.output)
-            exit(1)
+            sys.exit(1)
         self.progress("Build examples and vehicle binaries done !")
 
     def run_full(self, use_example=False) -> None:
@@ -276,7 +276,7 @@ class CoverageRunner(object):
                 print("ERROR :")
                 print(err.cmd)
                 print(err.output)
-                exit(1)
+                sys.exit(1)
         self.progress("Coverage successful. Open " + self.REPORT_DIR + "/index.html")
 
 

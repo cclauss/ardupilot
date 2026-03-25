@@ -2968,7 +2968,7 @@ class TestSuite(abc.ABC):
         # ../libraries/AP_LandingGear/AP_LandingGear.cpp).  The lists
         # here have been created to fix this discrepancy.
         vinfo_key = self.vehicleinfo_key()
-        if vinfo_key != 'ArduPlane' and vinfo_key != 'ArduCopter' and vinfo_key != 'Helicopter':
+        if vinfo_key not in {'ArduPlane', 'ArduCopter', 'Helicopter'}:
             ret.update([
                 "ATUN",  # Plane and Copter have ATUN messages
             ])
@@ -2984,7 +2984,7 @@ class TestSuite(abc.ABC):
                 "FWDT",  # quadplane
                 "VAR",   # variometer only applicable on Plane
             ])
-        if vinfo_key != 'ArduCopter' and vinfo_key != "Helicopter":
+        if vinfo_key not in {'ArduCopter', "Helicopter"}:
             ret.update([
                 "ARHS",    # autorotation
                 "AROT",    # autorotation
@@ -5027,8 +5027,8 @@ class TestSuite(abc.ABC):
             lines1 = [x.rstrip() for x in lines1]
             lines2 = [x.rstrip() for x in lines2]
             # remove now-empty lines:
-            lines1 = filter(lambda x: len(x), lines1)
-            lines2 = filter(lambda x: len(x), lines2)
+            lines1 = filter(len, lines1)
+            lines2 = filter(len, lines2)
 
         for l1, l2 in zip(lines1, lines2):
             l1 = l1.rstrip("\r\n")
@@ -7422,9 +7422,9 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="RangeFinderDistance",
             target=dist_min,
-            current_value_getter=lambda: self.get_rangefinder_distance(),
+            current_value_getter=self.get_rangefinder_distance,
             accuracy=(dist_max - dist_min),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             timeout=timeout,
             **kwargs
         )
@@ -7467,7 +7467,7 @@ class TestSuite(abc.ABC):
             target=(rpm_min+rpm_max)/2.0,
             current_value_getter=lambda: self.get_rpm(rpm_sensor),
             accuracy=rpm_max-rpm_min,
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             **kwargs
         )
 
@@ -7480,7 +7480,7 @@ class TestSuite(abc.ABC):
             target=(rpm_min+rpm_max)/2.0,
             current_value_getter=lambda: self.get_esc_rpm(esc),
             accuracy=rpm_max-rpm_min,
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             **kwargs
         )
 
@@ -7508,7 +7508,7 @@ class TestSuite(abc.ABC):
                 altitude_source=altitude_source,
             ),
             accuracy=(altitude_max - altitude_min)*0.5,
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             timeout=timeout,
             **kwargs
         )
@@ -7543,7 +7543,7 @@ class TestSuite(abc.ABC):
             target=speed_min,
             current_value_getter=lambda: get_climbrate(timeout),
             accuracy=(speed_max - speed_min),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             timeout=timeout,
             **kwargs
         )
@@ -7594,7 +7594,7 @@ class TestSuite(abc.ABC):
             value_name="Roll",
             target=roll,
             current_value_getter=lambda: get_roll(timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7616,7 +7616,7 @@ class TestSuite(abc.ABC):
             value_name="Pitch",
             target=pitch,
             current_value_getter=lambda: get_pitch(timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7862,7 +7862,7 @@ class TestSuite(abc.ABC):
             value_name="Heading",
             target=heading,
             current_value_getter=lambda: get_heading_wrapped(timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7881,7 +7881,7 @@ class TestSuite(abc.ABC):
             value_name="YawSpeed",
             target=yaw_speed,
             current_value_getter=lambda: get_yawspeed(timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7904,7 +7904,7 @@ class TestSuite(abc.ABC):
             value_name="SpeedVector",
             target=speed_vector,
             current_value_getter=lambda: self.get_speed_vector(timeout=timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7922,8 +7922,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="DescentRate",
             target=rate,
-            current_value_getter=lambda: self.get_descent_rate(),
-            validator=lambda value, target: validator(value, target),
+            current_value_getter=self.get_descent_rate,
+            validator=validator,
             accuracy=accuracy,
             **kwargs
         )
@@ -7947,7 +7947,7 @@ class TestSuite(abc.ABC):
             value_name="SpeedVectorBF",
             target=speed_vector,
             current_value_getter=lambda: get_speed_vector(timeout),
-            validator=lambda value2, target2: validator(value2, target2),
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -7965,7 +7965,7 @@ class TestSuite(abc.ABC):
             value_name=f"Distance({series1}, {series2})",
             minimum=min_distance,
             maximum=max_distance,
-            current_value_getter=lambda: get_distance(),
+            current_value_getter=get_distance,
             timeout=timeout,
             **kwargs
         )
@@ -8001,8 +8001,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="Distance",
             target=distance,
-            current_value_getter=lambda: get_distance(),
-            validator=lambda value2, target2: validator(value2, target2),
+            current_value_getter=get_distance,
+            validator=validator,
             accuracy=accuracy,
             timeout=timeout,
             **kwargs
@@ -8030,8 +8030,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="Distance",
             target=distance_min,
-            current_value_getter=lambda: get_distance(),
-            validator=lambda value2, target2: validator(value2, target2),
+            current_value_getter=get_distance,
+            validator=validator,
             accuracy=(distance_max - distance_min), timeout=timeout,
             **kwargs
         )
@@ -8049,8 +8049,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="Distance to home",
             target=distance_min,
-            current_value_getter=lambda: get_distance(),
-            validator=lambda value2, target2: validator(value2, target2),
+            current_value_getter=get_distance,
+            validator=validator,
             accuracy=(distance_max - distance_min), timeout=timeout,
             **kwargs
         )
@@ -8077,9 +8077,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="Distance to nav target",
             target=distance_min,
-            current_value_getter=lambda: get_distance(),
-            validator=lambda value2,
-            target2: validator(value2, target2),
+            current_value_getter=get_distance,
+            validator=validator,
             accuracy=(distance_max - distance_min),
             timeout=timeout,
             **kwargs
@@ -8120,9 +8119,8 @@ class TestSuite(abc.ABC):
         self.wait_and_maintain(
             value_name="Distance to (%f,%f,%f)" % (x, y, z_down),
             target=distance_min,
-            current_value_getter=lambda: get_distance(),
-            validator=lambda value2,
-            target2: validator(value2, target2),
+            current_value_getter=get_distance,
+            validator=validator,
             accuracy=(distance_max - distance_min),
             timeout=timeout,
             **kwargs
@@ -11144,7 +11142,7 @@ Also, ignores heartbeats not from our target system'''
             run_cmd = self.run_cmd
         if isinstance(id, str):
             id = eval("mavutil.mavlink.MAVLINK_MSG_ID_%s" % id)
-        if rate_hz == 0 or rate_hz == -1:
+        if rate_hz in (0, -1):
             set_interval = rate_hz
         else:
             set_interval = self.rate_to_interval_us(rate_hz)

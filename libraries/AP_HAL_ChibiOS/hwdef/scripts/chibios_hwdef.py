@@ -1165,7 +1165,7 @@ class ChibiOSHWDef(hwdef.HWDef):
         if self.get_mcu_config('EXPECTED_CLOCKS', required=False):
             clockrate = self.get_config('MCU_CLOCKRATE_MHZ', required=False)
             for mcu_clock, mcu_clock_speed in self.get_mcu_config('EXPECTED_CLOCKS'):
-                if (mcu_clock == 'STM32_HCLK' or mcu_clock == 'STM32_SYS_CK') and clockrate:
+                if (mcu_clock in {'STM32_HCLK', 'STM32_SYS_CK'}) and clockrate:
                     f.write('#define HAL_EXPECTED_%s %u\n' % (mcu_clock, int(clockrate) * 1000000))
                 else:
                     f.write('#define HAL_EXPECTED_%s %u\n' % (mcu_clock, mcu_clock_speed))
@@ -2938,7 +2938,7 @@ Please run: Tools/scripts/build_bootloaders.py %s
                     self.alllines.remove(line)
             newpins = []
             for pin in self.allpins:
-                if pin.type == u or pin.label == u or pin.portpin == u:
+                if u in (pin.type, pin.label, pin.portpin):
                     if pin.label is not None:
                         self.bylabel.pop(pin.label, '')
                     self.portmap[pin.port][pin.pin] = self.generic_pin(pin.port, pin.pin, None, 'INPUT', [], self.mcu_type, self.mcu_series, self.get_ADC1_chan, self.get_ADC2_chan, self.get_ADC3_chan, self.af_labels)  # noqa

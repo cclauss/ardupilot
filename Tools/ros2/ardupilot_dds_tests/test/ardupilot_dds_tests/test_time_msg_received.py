@@ -46,7 +46,7 @@ class TimeListener(rclpy.node.Node):
         self.subscription = self.create_subscription(Time, self.topic, self.subscriber_callback, 1)
 
         # Add a spin thread.
-        self.ros_spin_thread = threading.Thread(target=lambda node: rclpy.spin(node), args=(self,))
+        self.ros_spin_thread = threading.Thread(target=rclpy.spin, args=(self,))
         self.ros_spin_thread.start()
 
     def subscriber_callback(self, msg):

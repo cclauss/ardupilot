@@ -36,6 +36,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 from argparse import ArgumentParser
 
@@ -473,7 +474,7 @@ def main():
 
     if not args.files:
         print('Error: No parameter files specified.')
-        exit(1)
+        sys.exit(1)
 
     skip = SkippedChecks(
         no_missing=args.no_missing,
@@ -506,7 +507,7 @@ def main():
 
     # Check if any files failed (i.e. have error messages)
     if any(msgs for msgs in messages.values()):
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
