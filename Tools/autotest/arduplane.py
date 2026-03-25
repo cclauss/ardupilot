@@ -2858,8 +2858,7 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
             global max_alt
             if m.get_type()  != 'GLOBAL_POSITION_INT':
                 return
-            if m.relative_alt/1000.0 > max_alt:
-                max_alt = m.relative_alt/1000.0
+            max_alt = max(max_alt, m.relative_alt/1000.0)
 
         self.install_message_hook_context(record_maxalt)
 
@@ -2887,8 +2886,7 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
             global max_terrain_alt
             if m.get_type() != 'TERRAIN_REPORT':
                 return
-            if m.current_height > max_terrain_alt:
-                max_terrain_alt = m.current_height
+            max_terrain_alt = max(max_terrain_alt, m.current_height)
 
         self.context_push()
 
@@ -3003,8 +3001,7 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
             if rel_alt > alt*1.2 or rel_alt < alt * 0.8:
                 raise NotAchievedException("Not terrain following")
             delta = abs(rel_alt - gpi.relative_alt/1000.0)
-            if delta > max_delta:
-                max_delta = delta
+            max_delta = max(max_delta, delta)
         want_max_delta = 30
         if max_delta < want_max_delta:
             raise NotAchievedException(
@@ -4326,14 +4323,10 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
         min_loc = self.mav.location()
         max_loc = self.mav.location()
         for new_loc in locs:
-            if new_loc.lat < min_loc.lat:
-                min_loc.lat = new_loc.lat
-            if new_loc.lng < min_loc.lng:
-                min_loc.lng = new_loc.lng
-            if new_loc.lat > max_loc.lat:
-                max_loc.lat = new_loc.lat
-            if new_loc.lng > max_loc.lng:
-                max_loc.lng = new_loc.lng
+            min_loc.lat = min(min_loc.lat, new_loc.lat)
+            min_loc.lng = min(min_loc.lng, new_loc.lng)
+            max_loc.lat = max(max_loc.lat, new_loc.lat)
+            max_loc.lng = max(max_loc.lng, new_loc.lng)
 
         # Generate the return location based on min and max locs
         ret_lat = (min_loc.lat + max_loc.lat) / 2
@@ -7694,8 +7687,7 @@ class AutoTestPlane(vehicle_test_suite.TestSuite):
                     divergence > self.max_divergence):
                 self.progress(f"climb delta is {divergence}")
                 self.last_print = time.time()
-            if divergence > self.max_divergence:
-                self.max_divergence = divergence
+            self.max_divergence = max(self.max_divergence, divergence)
             if divergence > self.max_allowed_divergence:
                 msg = f"VFR_HUD.climb diverged from SIM_STATE.vd by {divergence}m/s (max={self.max_allowed_divergence}m/s"
                 if self.instafail:

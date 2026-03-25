@@ -385,8 +385,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         self.set_rc(3, 1200)
         time_left = timeout - (self.get_sim_time() - tstart)
         self.progress("timeleft = %u" % time_left)
-        if time_left < 20:
-            time_left = 20
+        time_left = max(time_left, 20)
         self.wait_altitude(-10, 10, timeout=time_left, relative=True)
         self.set_rc(3, 1500)
         self.save_wp()
@@ -787,9 +786,8 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             if check_alt:
                 if alt_valid and distance_valid:
                     home = "HOME"
-            else:
-                if distance_valid:
-                    home = "HOME"
+            elif distance_valid:
+                home = "HOME"
             if not quiet:
                 self.progress("Alt: %.02f  HomeDist: %.02f %s" %
                               (alt, home_distance, home))
@@ -7149,14 +7147,13 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
                 self.progress("Did not detect a motor peak, found %fHz at %fdB" % (freq, peakdb))
             else:
                 raise NotAchievedException("Did not detect a motor peak, found %fHz at %fdB" % (freq, peakdb))
+        elif reverse is not None:
+            raise NotAchievedException(
+                "Detected motor peak at %fHz, throttle %f%%, %fdB" %
+                (freq, hover_throttle, peakdb))
         else:
-            if reverse is not None:
-                raise NotAchievedException(
-                    "Detected motor peak at %fHz, throttle %f%%, %fdB" %
-                    (freq, hover_throttle, peakdb))
-            else:
-                self.progress("Detected motor peak at %fHz, throttle %f%%, %fdB" %
-                              (freq, hover_throttle, peakdb))
+            self.progress("Detected motor peak at %fHz, throttle %f%%, %fdB" %
+                          (freq, hover_throttle, peakdb))
 
         return freq, hover_throttle, peakdb, psd
 
@@ -9229,10 +9226,8 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         tstart = self.get_sim_time()
         while (self.get_sim_time() < tstart + 30):
             m = self.assert_receive_message('LOCAL_POSITION_NED')
-            if (m.z > z_max):
-                z_max = m.z
-            if (m.z < z_min):
-                z_min = m.z
+            z_max = max(z_max, m.z)
+            z_min = min(z_min, m.z)
         if (z_max-z_min > 0.5):
             raise NotAchievedException("Height variation is excessive")
         self.progress("Height variation is good")
@@ -10702,7 +10697,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
         # you can use terrain - if you don't the vehicle just uses a
         # plane based on home.
         # self.install_terrain_handlers_context()
-        while len(drivers):
+        while drivers:
             do_drivers = drivers[0:3]
             drivers = drivers[3:]
             command_line_args = []
@@ -10742,7 +10737,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             I2CDriverToTest("TFMiniPlus", 25, rngfnd_addr=0x09),
             I2CDriverToTest("TOFSenseF_I2C", 40, rngfnd_addr=0x08),
         ]
-        while len(i2c_drivers):
+        while i2c_drivers:
             do_drivers = i2c_drivers[0:9]
             i2c_drivers = i2c_drivers[9:]
             count = 1
@@ -11416,7 +11411,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
             if len(wanted) == 0 and seen_primary_change:
                 break
 
-        if len(wanted):
+        if wanted:
             raise NotAchievedException("Did not get all three GPS types")
         if not seen_primary_change:
             raise NotAchievedException("Did not see primary change")
@@ -11614,8 +11609,7 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
                     epsilon = axis_epsilons[n]
                     error = abs(measurements[2][n] - expected_blended)
                     # self.progress(f"{n=} {error=}")
-                    if error > max_errors[n]:
-                        max_errors[n] = error
+                    max_errors[n] = max(max_errors[n], error)
                     if error > epsilon:
                         raise NotAchievedException(f"Blended diverged {n=} {measurements[0][n]=} {measurements[1][n]=} {measurements[2][n]=} {error=}")  # noqa:E501
                 current_ts = None
@@ -11965,11 +11959,10 @@ class AutoTestCopter(vehicle_test_suite.TestSuite):
                 if seen_expected_start_TimeUS is None:
                     seen_expected_start_TimeUS = m.TimeUS
                     continue
-            else:
-                if seen_expected_start_TimeUS is not None:
-                    duration = (m.TimeUS - seen_expected_start_TimeUS)/1000000.0
-                    ret.append(duration)
-                    seen_expected_start_TimeUS = None
+            elif seen_expected_start_TimeUS is not None:
+                duration = (m.TimeUS - seen_expected_start_TimeUS)/1000000.0
+                ret.append(duration)
+                seen_expected_start_TimeUS = None
         if seen_expected_start_TimeUS is not None:
             duration = (last.TimeUS - seen_expected_start_TimeUS)/1000000.0
             ret.append(duration)

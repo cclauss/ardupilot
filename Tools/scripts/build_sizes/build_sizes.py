@@ -132,8 +132,7 @@ def write_table(h, build_type):
 
     max_mtime = 0
     for apjinfo in boards:
-        if apjinfo.mtime > max_mtime:
-            max_mtime = apjinfo.mtime
+        max_mtime = max(max_mtime, apjinfo.mtime)
 
     for apjinfo in boards:
         if apjinfo.flash_free < warning_flash_free and not apjinfo.flash_free == -1:

@@ -363,9 +363,8 @@ class SizeCompareBranches(BuildScriptBase):
         self.failure_exceptions = []
 
         thread_number = 0
-        while len(self.parallel_tasks) or len(threads):
-            if len(self.parallel_tasks) < self.n_threads:
-                self.n_threads = len(self.parallel_tasks)
+        while len(self.parallel_tasks) or threads:
+            self.n_threads = min(self.n_threads, len(self.parallel_tasks))
             while len(threads) < self.n_threads:
                 self.progress(f"Starting thread {thread_number}")
                 t = threading.Thread(

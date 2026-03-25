@@ -308,7 +308,7 @@ class LoggerDocco(object):
                 if extension not in [".cpp", ".h"]:
                     continue
                 self.files.append(filepath)
-        if len(_next):
+        if _next:
             self.search_for_files(_next)
 
     def parse_messagedef(self, messagedef):

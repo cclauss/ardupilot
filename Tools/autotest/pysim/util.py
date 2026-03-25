@@ -834,10 +834,8 @@ def gps_bearing(lat1, lon1, lat2, lon2):
 
 def constrain(value, minv, maxv):
     """Constrain a value to a range."""
-    if value < minv:
-        value = minv
-    if value > maxv:
-        value = maxv
+    value = max(value, minv)
+    value = min(value, maxv)
     return value
 
 

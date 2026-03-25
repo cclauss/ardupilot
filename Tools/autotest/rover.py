@@ -5832,10 +5832,9 @@ Brakes have negligible effect (with=%0.2fm without=%0.2fm delta=%0.2fm)
             if m is None:
                 self.progress("No POSITION_TARGET_GLOBAL_INT received")
                 continue
-            else:
-                if self.get_sim_time_cached() - tstart > 15:
-                    self.progress("Got POSITION_TARGET_GLOBAL_INT, all good !")
-                    break
+            elif self.get_sim_time_cached() - tstart > 15:
+                self.progress("Got POSITION_TARGET_GLOBAL_INT, all good !")
+                break
 
         self.start_subtest("Test End Mission Behavior ACRO")
         self.set_parameter("MIS_DONE_BEHAVE", 2)

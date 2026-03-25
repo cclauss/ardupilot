@@ -353,7 +353,7 @@ def process_library(vehicle, library, pathprefix=None):
                     error(f"tagged param: unknown parameter metadata field '{field_name}'")
                     continue
                 if not applicable_to_vehicle(vehicle.name, only_for_vehicles):
-                    if len(only_for_vehicles) and field_name in documentation_tags_which_are_comma_separated_nv_pairs:
+                    if only_for_vehicles and field_name in documentation_tags_which_are_comma_separated_nv_pairs:
                         seen_values_or_bitmask_for_other_vehicle = True
                     continue
 

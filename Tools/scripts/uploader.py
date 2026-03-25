@@ -451,8 +451,7 @@ class uploader(object):
         return value
 
     def __drawProgressBar(self, label, progress, maxVal):
-        if maxVal < progress:
-            progress = maxVal
+        progress = min(progress, maxVal)
 
         percent = (float(progress) / float(maxVal)) * 100.0
 

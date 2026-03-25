@@ -397,7 +397,7 @@ def run_specific_test(step, *args, **kwargs):
         if a.name in tests:
             run.append(a)
             tests.remove(a.name)
-    if len(tests):
+    if tests:
         print(f"Failed to find tests {tests}")
         sys.exit(1)
     return tester.autotest(tests=run, allow_skips=False, step_name=step), tester
@@ -1245,7 +1245,7 @@ if __name__ == "__main__":
             if a in moresteps:
                 matches.append(a)
 
-            if not len(matches):
+            if not matches:
                 print("No steps matched {}".format(a))
                 sys.exit(1)
             matched.extend(matches)

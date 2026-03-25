@@ -66,8 +66,7 @@ class EDNEmit(Emit):
                     bit_number = int(bit_parts[0])
                     bit_parts[0] = bit_number
                     bits.append(bit_parts)
-                    if bit_number > highest_set_bit:
-                        highest_set_bit = bit_number
+                    highest_set_bit = max(highest_set_bit, bit_number)
                 output_bits = (highest_set_bit+1)*[None]
                 for bit in bits:
                     output_bits[bit[0]] = bit[1]

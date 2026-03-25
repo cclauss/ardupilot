@@ -127,8 +127,7 @@ This is a list of log messages which may be present in logs produced and stored 
             check_width_rows.append(headings)
         longest_row_length = 0
         for row in check_width_rows:
-            if len(row) > longest_row_length:
-                longest_row_length = len(row)
+            longest_row_length = max(longest_row_length, len(row))
         if rowheadings is not None:
             longest_row_length += 1
         return longest_row_length
@@ -136,8 +135,7 @@ This is a list of log messages which may be present in logs produced and stored 
     def longest_line_in_string(self, string):
         longest = 0
         for line in string.split("\n"):
-            if len(line) > longest:
-                longest = len(line)
+            longest = max(longest, len(line))
         return longest
 
     def tablify_calc_row_widths_heights(self, rows, rowheadings, headings):
@@ -166,12 +164,10 @@ This is a list of log messages which may be present in logs produced and stored 
             colnum = 0
             for value in values_to_check:
                 height = len(value.split("\n"))
-                if height > heights[rownum]:
-                    heights[rownum] = height
+                heights[rownum] = max(heights[rownum], height)
                 longest_line = self.longest_line_in_string(value)
                 width = longest_line + 2  # +2 for leading/trailing ws
-                if width > widths[colnum]:
-                    widths[colnum] = width
+                widths[colnum] = max(widths[colnum], width)
                 colnum += 1
         return (widths, heights)
 

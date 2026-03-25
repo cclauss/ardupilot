@@ -1409,7 +1409,7 @@ class MAVliteMessage(object):
         # insert sequence numbers:
         seq = 0
         sequenced = bytearray()
-        while len(all_bytes):
+        while all_bytes:
             chunk = all_bytes[0:5]
             all_bytes = all_bytes[5:]
             sequenced.append(seq)
@@ -1424,7 +1424,7 @@ class MAVliteMessage(object):
         checksum = self.checksum_bytes(sequenced)
         sequenced.append(checksum)
 
-        while len(sequenced):
+        while sequenced:
             chunk = sequenced[0:6]
             sequenced = sequenced[6:]
             chunk.extend([0] * (6-len(chunk))) # pad to 6
@@ -1815,18 +1815,17 @@ class FRSkySPort(FRSky):
                 if self.crc != crc:
                     self.progress("Incorrect frsky checksum (received=%02x calculated=%02x id=0x%x)" % (crc, self.crc, dataid))
 #                    raise ValueError("Incorrect frsky checksum (want=%02x got=%02x id=0x%x)" % (crc, self.crc, dataid))
+                elif self.frame == self.SPORT_DOWNLINK_FRAME:
+                    self.handle_data_downlink([
+                        self.id1,
+                        self.id2,
+                        self.data_bytes[0],
+                        self.data_bytes[1],
+                        self.data_bytes[2],
+                        self.data_bytes[3]]
+                    )
                 else:
-                    if self.frame == self.SPORT_DOWNLINK_FRAME:
-                        self.handle_data_downlink([
-                            self.id1,
-                            self.id2,
-                            self.data_bytes[0],
-                            self.data_bytes[1],
-                            self.data_bytes[2],
-                            self.data_bytes[3]]
-                        )
-                    else:
-                        self.handle_data(dataid, self.data)
+                    self.handle_data(dataid, self.data)
                 self.state = self.state_SEND_POLL
             elif self.state == self.state_SEND_POLL:
                 # this is done in check_poll
@@ -3093,11 +3092,11 @@ class TestSuite(abc.ABC):
                         continue
                     raise NotAchievedException(msg)
 
-        if len(undocumented):
+        if undocumented:
             for name in sorted(undocumented):
                 self.progress(f"Undocumented message: {name}")
             raise NotAchievedException("Undocumented messages found")
-        if len(overdocumented):
+        if overdocumented:
             for name in sorted(overdocumented):
                 self.progress(f"Message documented when it shouldn't be: {name}")
             raise NotAchievedException("Overdocumented messages found")
@@ -3398,8 +3397,7 @@ class TestSuite(abc.ABC):
                     divergence > self.max_divergence):
                 self.progress(f"distance(SIMSTATE,{self.other_int_message_name})={divergence:.5f}m")
                 self.last_print = time.time()
-            if divergence > self.max_divergence:
-                self.max_divergence = divergence
+            self.max_divergence = max(self.max_divergence, divergence)
             if divergence > self.max_allowed_divergence:
                 raise NotAchievedException(
                     "%s diverged from simstate by %fm (max=%fm" %
@@ -3593,8 +3591,7 @@ class TestSuite(abc.ABC):
     def assert_bytes_equal(self, bytes1, bytes2, maxlen=None):
         tocheck = len(bytes1)
         if maxlen is not None:
-            if tocheck > maxlen:
-                tocheck = maxlen
+            tocheck = min(tocheck, maxlen)
         for i in range(0, tocheck):
             if bytes1[i] != bytes2[i]:
                 raise NotAchievedException("differ at offset %u" % i)
@@ -4004,8 +4001,7 @@ class TestSuite(abc.ABC):
             bytes_to_fetch
         )
         bytes_to_read = bytes_to_fetch
-        if log_entry.size < bytes_to_read:
-            bytes_to_read = log_entry.size
+        bytes_to_read = min(bytes_to_read, log_entry.size)
         data_downloaded = []
         bytes_read = 0
         last_print = 0
@@ -4038,8 +4034,7 @@ class TestSuite(abc.ABC):
             data_downloaded = []
             while bytes_read < bytes_to_read:
                 bytes_to_fetch = int(random.random() * 100)
-                if bytes_to_fetch > 90:
-                    bytes_to_fetch = 90
+                bytes_to_fetch = min(bytes_to_fetch, 90)
                 self.progress("Sending request for %u bytes at offset %u" % (bytes_to_fetch, bytes_read))
                 self.mav.mav.log_request_data_send(
                     self.sysid_thismav(),
@@ -4065,17 +4060,14 @@ class TestSuite(abc.ABC):
 
         self.start_subtest("Download log backwards")
         bytes_to_read = bytes_to_fetch
-        if log_entry.size < bytes_to_read:
-            bytes_to_read = log_entry.size
+        bytes_to_read = min(bytes_to_read, log_entry.size)
         bytes_read = 0
         backwards_data_downloaded = []
         last_print = 0
         while bytes_read < bytes_to_read:
             bytes_to_fetch = int(random.random() * 99) + 1
-            if bytes_to_fetch > 90:
-                bytes_to_fetch = 90
-            if bytes_to_fetch > bytes_to_read - bytes_read:
-                bytes_to_fetch = bytes_to_read - bytes_read
+            bytes_to_fetch = min(bytes_to_fetch, 90)
+            bytes_to_fetch = min(bytes_to_fetch, bytes_to_read - bytes_read)
             ofs = bytes_to_read - bytes_read - bytes_to_fetch
             # self.progress("bytes_to_read=%u bytes_read=%u bytes_to_fetch=%u ofs=%d" %
             # (bytes_to_read, bytes_read, bytes_to_fetch, ofs))
@@ -7775,7 +7767,7 @@ class TestSuite(abc.ABC):
                 else:
                     is_value_valid = validator(last_value, minimum, maximum)
             else:
-                is_value_valid = (minimum <= last_value) and (last_value <= maximum)
+                is_value_valid = (minimum <= last_value <= maximum)
             if self.get_sim_time_cached() - last_print_time > 1:
                 if is_value_valid:
                     want_or_got = "got"
@@ -7796,27 +7788,26 @@ class TestSuite(abc.ABC):
                          accuracy,
                          achieved_duration_bit)
                     )
+                elif isinstance(last_value, float):
+                    self.progress(
+                        "%s=%0.2f (%s between %s and %s)%s" %
+                        (value_name,
+                         last_value,
+                         want_or_got,
+                         str(minimum),
+                         str(maximum),
+                         achieved_duration_bit)
+                    )
                 else:
-                    if isinstance(last_value, float):
-                        self.progress(
-                            "%s=%0.2f (%s between %s and %s)%s" %
-                            (value_name,
-                             last_value,
-                             want_or_got,
-                             str(minimum),
-                             str(maximum),
-                             achieved_duration_bit)
-                        )
-                    else:
-                        self.progress(
-                            "%s=%s (%s between %s and %s)%s" %
-                            (value_name,
-                             last_value,
-                             want_or_got,
-                             str(minimum),
-                             str(maximum),
-                             achieved_duration_bit)
-                        )
+                    self.progress(
+                        "%s=%s (%s between %s and %s)%s" %
+                        (value_name,
+                         last_value,
+                         want_or_got,
+                         str(minimum),
+                         str(maximum),
+                         achieved_duration_bit)
+                    )
                 last_print_time = self.get_sim_time_cached()
             if is_value_valid:
                 if value_averager is not None:
@@ -8227,7 +8218,7 @@ class TestSuite(abc.ABC):
                                  (str(m), channel_field))
             self.progress("want %u <= SERVO_OUTPUT_RAW.%s <= %u, got value = %u" %
                           (v_min, channel_field, v_max, m_value))
-            if (v_min <= m_value) and (m_value <= v_max):
+            if (v_min <= m_value <= v_max):
                 return m_value
 
     def assert_servo_channel_value(self, channel, value, comparator=operator.eq):
@@ -8502,33 +8493,30 @@ class TestSuite(abc.ABC):
                 if do_assert:
                     raise NotAchievedException("Sensor not present")
                 return False
-        else:
-            if reported_present:
-                if do_assert:
-                    raise NotAchievedException("Sensor present when it shouldn't be")
-                return False
+        elif reported_present:
+            if do_assert:
+                raise NotAchievedException("Sensor present when it shouldn't be")
+            return False
 
         if enabled:
             if not reported_enabled:
                 if do_assert:
                     raise NotAchievedException("Sensor not enabled")
                 return False
-        else:
-            if reported_enabled:
-                if do_assert:
-                    raise NotAchievedException("Sensor enabled when it shouldn't be")
-                return False
+        elif reported_enabled:
+            if do_assert:
+                raise NotAchievedException("Sensor enabled when it shouldn't be")
+            return False
 
         if healthy:
             if not reported_healthy:
                 if do_assert:
                     raise NotAchievedException("Sensor not healthy")
                 return False
-        else:
-            if reported_healthy:
-                if do_assert:
-                    raise NotAchievedException("Sensor healthy when it shouldn't be")
-                return False
+        elif reported_healthy:
+            if do_assert:
+                raise NotAchievedException("Sensor healthy when it shouldn't be")
+            return False
         return True
 
     def wait_sensor_state(self, sensor, present=True, enabled=True, healthy=True, timeout=5, verbose=False):
@@ -8973,8 +8961,7 @@ Also, ignores heartbeats not from our target system'''
             return
         longest = 0
         for desc in self.test_timings.keys():
-            if len(desc) > longest:
-                longest = len(desc)
+            longest = max(longest, len(desc))
         tests_total_time = 0
         for desc, test_time in sorted(self.test_timings.items(),
                                       key=self.show_test_timings_key_sorter):
@@ -8991,7 +8978,7 @@ Also, ignores heartbeats not from our target system'''
         if not isinstance(text, bytes):
             text = bytes(text, "ascii")
         seq = 0
-        while len(text):
+        while text:
             self.mav.mav.statustext_send(mavutil.mavlink.MAV_SEVERITY_WARNING, text[:50], id=self.statustext_id, chunk_seq=seq)
             text = text[50:]
             seq += 1
@@ -9252,10 +9239,9 @@ Also, ignores heartbeats not from our target system'''
         if passed:
 #            self.remove_bin_logs() # can't do this as one of the binlogs is probably open for writing by the SITL process.  If we force a rotate before running tests then we can do this.  # noqa
             pass
-        else:
-            if self.logs_dir is not None:
-                # stash the binary logs and corefiles away for later analysis
-                self.check_logs(name, bin_logs=pre_reboot_bin_logs)
+        elif self.logs_dir is not None:
+            # stash the binary logs and corefiles away for later analysis
+            self.check_logs(name, bin_logs=pre_reboot_bin_logs)
 
         if passed:
             self.progress('PASSED: "%s"' % prettyname)
@@ -11116,7 +11102,7 @@ Also, ignores heartbeats not from our target system'''
                     if len(wants) == 0:
                         break
 
-        if len(wants):
+        if wants:
             msg = ", ".join([x[0] for x in wants])
             raise NotAchievedException("Did not find (%s)" % msg)
 
@@ -12729,9 +12715,8 @@ switch value'''
                                  (m.param_index, m.param_count))
             if expected_count is None:
                 expected_count = m.param_count
-            else:
-                if m.param_count != expected_count:
-                    raise ValueError("expected count changed")
+            elif m.param_count != expected_count:
+                raise ValueError("expected count changed")
             if m.param_id not in seen_ids:
                 count += 1
                 seen_ids[m.param_id] = m.param_value
@@ -14158,7 +14143,7 @@ switch value'''
         last_wanting_print = 0
 
         last_data_time = None
-        while len(wants):
+        while wants:
             now = self.get_sim_time()
             if now - last_wanting_print > 1:
                 self.progress("Still wanting (%s)" %
@@ -14267,8 +14252,7 @@ switch value'''
             return False
 
         constrained_fix_type = m.fix_type
-        if constrained_fix_type > 3:
-            constrained_fix_type = 3
+        constrained_fix_type = min(constrained_fix_type, 3)
         print("fix_type: %s" % g.fix_type())
         if constrained_fix_type != g.fix_type():
             return False
@@ -15533,7 +15517,7 @@ SERIAL5_BAUD 128
 
         results = self.run_tests(tests)
 
-        if len(skip_list):
+        if skip_list:
             self.progress("Skipped tests:")
             for skipped in skip_list:
                 (test, reason) = skipped

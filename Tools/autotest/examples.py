@@ -136,7 +136,7 @@ def run_examples(debug=False, valgrind=False, gdb=False):
             print_exception_stacktrace(e)
             failures.append(afile)
 
-    if len(failures):
+    if failures:
         print("Failed examples:")
         for failure in failures:
             print(f"    {failure}")

@@ -261,7 +261,7 @@ class EnumDocco(object):
                 if filepath.endswith("libraries/AP_GPS/AP_GPS_UBLOX_CFGv2.h"):
                     continue
                 self.files.append(filepath)
-        if len(_next):
+        if _next:
             self.search_for_files(_next)
 
     def parse_files(self):

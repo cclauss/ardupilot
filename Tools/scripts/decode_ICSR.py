@@ -37,8 +37,7 @@ class DecodeICSR(object):
         for bit in self.M4_BITS:
             (bits, name, decoder) = bit
             length = len(name)
-            if length > self.longest_name_length:
-                self.longest_name_length = length
+            self.longest_name_length = max(self.longest_name_length, length)
 
     def decoder_m4_vectactive(self, value):
         exceptions = {

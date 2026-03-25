@@ -408,8 +408,7 @@ class AutoTestSub(vehicle_test_suite.TestSuite):
             if true_distance is None:
                 continue
             match_delta = abs(true_distance - match_distance)
-            if match_delta > max_delta:
-                max_delta = match_delta
+            max_delta = max(max_delta, match_delta)
             if match_delta > delta:
                 raise NotAchievedException(
                     "Distance not maintained: want %.2f (+/- %.2f) got=%.2f (%.2f)" %
@@ -1131,8 +1130,7 @@ class AutoTestSub(vehicle_test_suite.TestSuite):
 
             if dcurr - dmax < -0.2:
                 raise NotAchievedException("Bounced back from %.2fm to %.2fm" % (dmax, dcurr))
-            if dcurr > dmax:
-                dmax = dcurr
+            dmax = max(dmax, dcurr)
 
             if abs(dcurr - dprev) < 0.1:
                 self.progress("Stopping distance %.2fm, less than %.2fs" % (dcurr, self.get_sim_time_cached() - tstart))
